@@ -6,6 +6,7 @@ import pandas as pd
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts import PromptTemplate
 from langchain.evaluation.qa import QAEvalChain
+import inspect
 
 st.title("Prompt AB 测试 SaaS Demo")
 
@@ -118,9 +119,9 @@ def run_ab_test(tasks, prompt_files, llm_model, judge_model, api_key, base_url):
                 output = llm_worker.predict(prompt.format(**input_vars))
                 latency = round((time.time() - t0) * 1000)
                 eval_result = qa_eval_chain.evaluate(
-                    predictions=[output],
-                    references=[task["ground_truth"]],
-                    input_list=[{"query": task["question"]}]
+                    prediction=output,
+                    input=input_vars,
+                    reference=task["ground_truth"]
                 )
                 score = eval_result[0].get("results", eval_result[0].get("result", ""))
                 results.append({
